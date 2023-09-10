@@ -1,5 +1,5 @@
 # Medication Reminder System
-For now, it cant work, we are trying our best to find out the bug and we believe we could finish the project if we had more time.
+For now, it can work. But is has some bugs. For example, when it is lighting up red and I press the key, it wont light up to green color. But after 3 keys light up red, only it can change to green color. 
 ## Overview
 
 The Medication Reminder System is a Raspberry Pi Pico-based project designed to help individuals, especially the elderly, remember to take their medication on time. By utilizing the PICO RGB Keypad, LEDs, and a buzzer, this system provides both visual and audible reminders, contributing to the promotion of good health and well-being.
@@ -12,8 +12,6 @@ The primary goal of this project is to create a simple and effective medication 
 
 - Raspberry Pi Pico
 - PICO RGB Keypad
-- LEDs (for visual alerts)
-- Buzzer (for audible alerts)
 
 ### Functionality
 
