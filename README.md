@@ -4,8 +4,6 @@
 
 The Medication Reminder System is a Raspberry Pi Pico-based project designed to help individuals, especially the elderly, remember to take their medication on time. By utilizing the PICO RGB Keypad, LEDs, and a buzzer, this system provides both visual and audible reminders, contributing to the promotion of good health and well-being.
 
-![Project Image or Logo](link_to_image.png)
-
 ## Project Idea
 
 The primary goal of this project is to create a simple and effective medication reminder system using the following components:
