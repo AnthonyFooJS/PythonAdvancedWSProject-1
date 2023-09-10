@@ -1,58 +1,78 @@
 from pmk import PMK
 from pmk.platform.rgbkeypadbase import RGBKeypadBase as Hardware
+import usb_midi
+import adafruit_midi
+from adafruit_midi.note_off import NoteOff
+from adafruit_midi.note_on import NoteOn
 import time
 
 keypico = PMK(Hardware())
 keys = keypico.keys
 
-# Medication schedule (time in seconds)
-medication_schedule = {
-    0: {"name": "Morning", "time": 10},  # Medication reminder every 10 seconds
-    1: {"name": "Lunch", "time": 20},    # Medication reminder every 20 seconds
-    2: {"name": "Dinner", "time": 30},   # Medication reminder every 30 seconds
-}
+midi = adafruit_midi.MIDI(midi_out=usb_midi.ports[1], 
+                          out_channel=0)
 
-# LED colors
-led_off = (0, 0, 0)
-led_red = (255, 0, 0)
-led_green = (0, 255, 0)
+# Colour selection
+snow = (0, 0, 0)
+blue = (0, 0, 255)
+cyan = (0, 255, 255)
+red = (255, 0, 0)
+green = (0, 255, 0)
+purple = (255, 0, 255)
 
-# Initialize LED states for all keys
-for key in keys:
-    key.set_led(*led_off)
+# Set key colours for all keys
+keypico.set_all(*snow)
 
-# Event handlers for key presses, releases, and holds
+# Orientation
+# keypico.set_led(0, *red)
+# keypico.set_led(3, *green)
+# keypico.set_led(12, *blue)
+# keypico.set_led(15, *purple)
+
+# Set sleep time
+keypico.led_sleep_enabled = True
+keypico.led_sleep_time = 10
+
+# Midi
+
+start_note = 68
+velocity = 127
+
+# Loop
+
 for key in keys:
     @keypico.on_press(key)
     def press_handler(key):
-        print("Key {} pressed".format(key.number))
-        key.set_led(*led_green)  # Turn the key green when pressed
+        key.set_led(*green)
+        note = start_note + key.number
+        midi.send(NoteOn(note, velocity))
 
     @keypico.on_release(key)
     def release_handler(key):
-        print("Key {} released".format(key.number))
         if key.rgb == [255, 0, 0]:
-            key.set_led(*led_red)
+            key.set_led(*green)
         else:
-            key.set_led(*led_off)
+            key.set_led(*green)
+        note = start_note + key.number
+        midi.send(NoteOff(note, 0))
 
     @keypico.on_hold(key)
     def hold_handler(key):
-        print("Key {} held".format(key.number))
-        key.set_led(*led_green)  # Continue showing green while the key is held
+        key.set_led(*purple)
 
-# Medication reminder loop
+
+time.sleep(10)
+keypico.set_led(0, *red)
+print("Morning Medication Reminder")
+keypico.update()
+time.sleep(10)
+keypico.set_led(1, *red)
+print("Afternoon Medication Reminder")
+keypico.update()
+time.sleep(10)
+keypico.set_led(2, *red)
+print("Evening Medication Reminder")
+keypico.update()
+
 while True:
     keypico.update()
-    current_time = int(time.time())  # Convert current time to integer
-
-    for key_number, schedule_data in medication_schedule.items():
-        if current_time >= schedule_data["time"]:
-            # It's time to take medication
-            key = keys[key_number]
-            key.set_led(*led_red)  # Turn the key red to indicate medication time
-            time.sleep(5)  # Keep it red for 5 seconds
-            key.set_led(*led_off)  # Turn the key back to no color
-
-    # Delay to check the medication schedule periodically (every 1 second)
-    time.sleep(1)
